@@ -1,33 +1,33 @@
 (function() {
     let stopSearch = false;
 
-function enviarProgresso(progress){
+function sendProgress(progress){
 	chrome.runtime.sendMessage({ type: 'progressUpdate', progress: progress });
 }
 
-async function procurarElemento(pagina) {
-    const elemento = document.evaluate(`//*[@id="p${pagina}--0"]/div/div[2]/object`,document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
-    const elementox = document.evaluate(`//*[@id="p${pagina}--0"]`,document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
+async function searchElement(page) {
+    const element = document.evaluate(`//*[@id="p${page}--0"]/div/div[2]/object`,document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
+    const elementx = document.evaluate(`//*[@id="p${page}--0"]`,document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
 
-    if (elemento) {
-        return elementox.innerHTML + '<br>' + '\n';
+    if (element) {
+        return elementx.innerHTML + '<br>' + '\n';
     }
     return null;
 }
 
-async function downloadResultados(resultados, nomeArquivo) {
-    const blob = new Blob(resultados, { type: 'text/html' });
+async function downloadResults(results, filename) {
+    const blob = new Blob(results, { type: 'text/html' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = nomeArquivo;
+    link.download = filename;
     link.click();
     clearIndexedDB();
 }
 
 async function getAllContent(db) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['conteudo'], 'readonly');
-        const store = transaction.objectStore('conteudo');
+        const transaction = db.transaction(['content'], 'readonly');
+        const store = transaction.objectStore('content');
         const allContentRequest = store.getAll();
 
         allContentRequest.onsuccess = function (event) {
@@ -42,8 +42,8 @@ async function getAllContent(db) {
 
 async function getAllKeys(db) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['conteudo'], 'readonly');
-        const store = transaction.objectStore('conteudo');
+        const transaction = db.transaction(['content'], 'readonly');
+        const store = transaction.objectStore('content');
         const getAllKeysRequest = store.getAllKeys();
 
         getAllKeysRequest.onsuccess = function (event) {
@@ -55,38 +55,38 @@ async function getAllKeys(db) {
         };
     });
 }
-async function exibirMensagemInicial(pagefinal) {
-    const mensagemElement = document.createElement('div');
-    mensagemElement.style.position = 'fixed';
-    mensagemElement.style.top = '50%';
-    mensagemElement.style.left = '50%';
-    mensagemElement.style.transform = 'translate(-50%, -50%)';
-    mensagemElement.style.padding = '20px';
-    mensagemElement.style.background = '#ffffff';
-    mensagemElement.style.border = '1px solid #ccc';
-    mensagemElement.style.zIndex = '9999';
-    mensagemElement.style.fontWeight = 'bold';
-    mensagemElement.id = 'mensagem';
-    document.body.appendChild(mensagemElement);
+async function displayHomeMessage(pagefinal) {
+    const messageElement = document.createElement('div');
+    messageElement.style.position = 'fixed';
+    messageElement.style.top = '50%';
+    messageElement.style.left = '50%';
+    messageElement.style.transform = 'translate(-50%, -50%)';
+    messageElement.style.padding = '20px';
+    messageElement.style.background = '#ffffff';
+    messageElement.style.border = '1px solid #ccc';
+    messageElement.style.zIndex = '9999';
+    messageElement.style.fontWeight = 'bold';
+    messageElement.id = 'message';
+    document.body.appendChild(messageElement);
     const db = await openIndexedDB();
-    const ultimaPagina = await getLastProcessedIndex(db);
-    mensagemElement.textContent = `Page ${ultimaPagina}/${pagefinal} found. Keep scrolling to the page ${pagefinal}`;
-    return mensagemElement;
+    const lastpage = await getLastProcessedIndex(db);
+    messageElement.textContent = `Page ${lastpage}/${pagefinal} found. Keep scrolling to the page ${pagefinal}`;
+    return messageElement;
 }
 
 async function startSearchingAndSaving() {
     try {
-        var elemento = document.querySelector('div[data-test-locator="pagination-total-chapter-numbers"]');
+        var element = document.querySelector('div[data-test-locator="pagetion-total-chapter-numbers"]');
         var pagefinal = null;
-        if (elemento !== null) {
-            var conteudo = elemento.textContent.trim();
-            var numeros = conteudo.match(/\d+/g);
-            if (numeros !== null && numeros.length > 0) {
-                var numero = parseInt(numeros[0]);
-                pagefinal = Number(numero);
+        if (element !== null) {
+            var content = element.textContent.trim();
+            var numbers = content.match(/\d+/g);
+            if (numbers !== null && numbers.length > 0) {
+                var number = parseInt(numbers[0]);
+                pagefinal = Number(number);
             }
         }
-		const mensagemInicial = await exibirMensagemInicial(pagefinal);
+		const initialMessage = await displayHomeMessage(pagefinal);
 
         let stopButton = document.createElement('button');
         stopButton.textContent = 'Quit and save';
@@ -100,36 +100,36 @@ async function startSearchingAndSaving() {
         document.body.appendChild(stopButton);
         let timeoutID;
 
-        let resultadosArray = [];
+        let resultsArray = [];
 
         stopButton.addEventListener('click', async () => {
             stopSearch = true;
             stopButton.remove();
-            const messages = document.querySelectorAll('div#mensagem');
+            const messages = document.querySelectorAll('div#message');
             messages.forEach(message => {
                 message.remove();
             });
             window.clearTimeout(timeoutID);
-            console.log("Busca encerrada pelo usuário.");
+            console.log("Search closed by user.");
             const db = await openIndexedDB();
 
             const allKeys = await getAllKeys(db);
             let combinedContent = [];
 
             for (const key of allKeys) {
-                const content = await getTodoConteudoByKey(db, key);
+                const content = await getAllContentByKey(db, key);
                 if (Array.isArray(content)) {
                     combinedContent = combinedContent.concat(content);
                 }
             }
 
-            await downloadResultados(combinedContent, 'perlego.html');
+            await downloadResults(combinedContent, 'perlego.html');
         });
 
-        async function getTodoConteudoByKey(db, key) {
+        async function getAllContentByKey(db, key) {
             return new Promise((resolve, reject) => {
-                const transaction = db.transaction(['conteudo'], 'readonly');
-                const store = transaction.objectStore('conteudo');
+                const transaction = db.transaction(['content'], 'readonly');
+                const store = transaction.objectStore('content');
                 const request = store.get(key);
 
                 request.onsuccess = function (event) {
@@ -142,71 +142,71 @@ async function startSearchingAndSaving() {
             });
         }
 
-        async function rolarAteEncontrarPagina(pagina) {
+        async function scrollToFindPage(page) {
             const db = await openIndexedDB();
             const lastProcessedIndex = await getLastProcessedIndex(db) || 0;
-            const storedResult = await getTodoConteudo(db);
+            const storedResult = await getAllContent(db);
 
-            resultadosArray = storedResult ? storedResult : [];
+            resultsArray = storedResult ? storedResult : [];
 
-            if (pagina <= pagefinal && !stopSearch) {
-                if (pagina > lastProcessedIndex) {
-                    const conteudoElemento = await procurarElemento(pagina);
+            if (page <= pagefinal && !stopSearch) {
+                if (page > lastProcessedIndex) {
+                    const contentelement = await searchElement(page);
 
-                    let mensagem = document.getElementById('mensagem');
+                    let message = document.getElementById('message');
 
-                    if (conteudoElemento === null && !stopSearch) {
-                        if (!mensagem) {
-                        mensagem = document.createElement('div');
-                        mensagem.style.position = 'fixed';
-                        mensagem.style.top = '50%';
-                        mensagem.style.left = '50%';
-                        mensagem.style.transform = 'translate(-50%, -50%)';
-                        mensagem.style.padding = '20px';
-                        mensagem.style.background = '#ffffff';
-                        mensagem.style.border = '1px solid #ccc';
-                        mensagem.style.zIndex = '9999';
-                        mensagem.style.fontWeight = 'bold';
-                        mensagem.id = 'mensagem';
-                        document.body.appendChild(mensagem);
+                    if (contentelement === null && !stopSearch) {
+                        if (!message) {
+                        message = document.createElement('div');
+                        message.style.position = 'fixed';
+                        message.style.top = '50%';
+                        message.style.left = '50%';
+                        message.style.transform = 'translate(-50%, -50%)';
+                        message.style.padding = '20px';
+                        message.style.background = '#ffffff';
+                        message.style.border = '1px solid #ccc';
+                        message.style.zIndex = '9999';
+                        message.style.fontWeight = 'bold';
+                        message.id = 'message';
+                        document.body.appendChild(message);
                         }
-                        mensagem.textContent = `Page ${pagina-1}/${pagefinal} found. Keep scrolling to the page ${pagefinal}`;
-                        rolarAteEncontrarPagina(pagina);
+                        message.textContent = `Page ${page-1}/${pagefinal} found. Keep scrolling to the page ${pagefinal}`;
+                        scrollToFindPage(page);
                     } else if (!stopSearch) {
-                        let mensagemElement = document.getElementById('mensagem');
-                        if (mensagemElement) {
-                            mensagemElement.textContent = `Page ${pagina}/${pagefinal} found. Keep scrolling to the page ${pagefinal}`;
+                        let messageElement = document.getElementById('message');
+                        if (messageElement) {
+                            messageElement.textContent = `Page ${page}/${pagefinal} found. Keep scrolling to the page ${pagefinal}`;
                         }
-                        console.log(`Conteúdo do elemento da página ${pagina} encontrado:`);
-                        const progressoAtual = Math.floor((pagina / pagefinal) * 100);
-                        enviarProgresso(progressoAtual);
+                        console.log(`Page element content ${page} found:`);
+                        const currentProgress = Math.floor((page / pagefinal) * 100);
+                        sendProgress(currentProgress);
                         try {
-                            resultadosArray.push(conteudoElemento);
-                            await putLastProcessedIndex(db, pagina);
+                            resultsArray.push(contentelement);
+                            await putLastProcessedIndex(db, page);
                             const chunkSize = 50;
                             let index = 0;
-                            while (index < resultadosArray.length) {
-                                const chunk = resultadosArray.slice(index, index + chunkSize);
+                            while (index < resultsArray.length) {
+                                const chunk = resultsArray.slice(index, index + chunkSize);
                                 index += chunkSize;
-                                const paddedPage = `p${pagina}`.padStart(Math.max(4, `${pagina}`.length + 1), '0');
-                                await putTodoConteudo(db, paddedPage, chunk);
+                                const paddedPage = `p${page}`.padStart(Math.max(4, `${page}`.length + 1), '0');
+                                await putAllContent(db, paddedPage, chunk);
                             }
-                            rolarAteEncontrarPagina(pagina + 1);
+                            scrollToFindPage(page + 1);
                         } catch(error) {
                             console.log(error)
                         }
-                        if (pagina === pagefinal) {
+                        if (page === pagefinal) {
                             stopButton.click();
                             stopSearch = true;
                             return; 
                         }
                     }                    
                 } else {
-                    rolarAteEncontrarPagina(pagina + 1);
+                    scrollToFindPage(page + 1);
                 }
             }
         }
-        await rolarAteEncontrarPagina(1);
+        await scrollToFindPage(1);
     } catch (error) {
         if (error) {
             console.log(error)
@@ -217,11 +217,11 @@ async function startSearchingAndSaving() {
 
 async function openIndexedDB() {
     return new Promise((resolve, reject) => {
-        const dbOpenRequest = window.indexedDB.open('MeuBancoDeDados', 1);
+        const dbOpenRequest = window.indexedDB.open('MyDatabase', 1);
 
         dbOpenRequest.onupgradeneeded = function (event) {
             const db = event.target.result;
-            db.createObjectStore('conteudo', { autoIncrement: true });
+            db.createObjectStore('content', { autoIncrement: true });
         };
 
         dbOpenRequest.onsuccess = function (event) {
@@ -237,19 +237,19 @@ async function openIndexedDB() {
 async function clearIndexedDB() {
     try {
         const db = await openIndexedDB();
-        const transaction = db.transaction(['conteudo'], 'readwrite');
-        const store = transaction.objectStore('conteudo');
+        const transaction = db.transaction(['content'], 'readwrite');
+        const store = transaction.objectStore('content');
         store.clear();
-        console.log('Dados anteriores foram apagados com sucesso.');
+        console.log('Previous data was successfully deleted.');
     } catch (error) {
-        console.error('Erro ao apagar os dados anteriores:', error);
+        console.error('Error deleting previous data:', error);
     }
 }
 
 async function getLastProcessedIndex(db) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['conteudo'], 'readonly');
-        const store = transaction.objectStore('conteudo');
+        const transaction = db.transaction(['content'], 'readonly');
+        const store = transaction.objectStore('content');
         const lastIndexRequest = store.get('lastProcessedIndex');
 
         lastIndexRequest.onsuccess = function (event) {
@@ -264,8 +264,8 @@ async function getLastProcessedIndex(db) {
 
 async function putLastProcessedIndex(db, index) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['conteudo'], 'readwrite');
-        const store = transaction.objectStore('conteudo');
+        const transaction = db.transaction(['content'], 'readwrite');
+        const store = transaction.objectStore('content');
         const putRequest = store.put(index, 'lastProcessedIndex');
 
         putRequest.onsuccess = function (event) {
@@ -278,11 +278,11 @@ async function putLastProcessedIndex(db, index) {
     });
 }
 
-async function getTodoConteudo(db) {
+async function getTodocontent(db) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['conteudo'], 'readonly');
-        const store = transaction.objectStore('conteudo');
-        const request = store.get('todoConteudo');
+        const transaction = db.transaction(['content'], 'readonly');
+        const store = transaction.objectStore('content');
+        const request = store.get('AllContent');
 
         request.onsuccess = function (event) {
             resolve(event.target.result);
@@ -294,10 +294,10 @@ async function getTodoConteudo(db) {
     });
 }
 
-async function putTodoConteudo(db, key, content) {
+async function putAllContent(db, key, content) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['conteudo'], 'readwrite');
-        const store = transaction.objectStore('conteudo');
+        const transaction = db.transaction(['content'], 'readwrite');
+        const store = transaction.objectStore('content');
         const getRequest = store.get(key);
 
         getRequest.onsuccess = function (event) {
