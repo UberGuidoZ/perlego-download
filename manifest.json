@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Perlego Download",
+  "name": "Perlego Manual Downloader",
   "version": "3.0",
   "action": { 
     "default_popup": "popup.html"
