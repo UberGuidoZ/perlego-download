@@ -1,8 +1,13 @@
-# A Chrome extension to automate content downloads
+# Chrome extension to automate Perlego content downloads
 
-# NOTE: An active Perlego account is required!
+> # NOTE: An active Perlego account is required!
 
--  **To install this extension in chrome please follow the steps indicated [here](https://dev.to/ben/how-to-install-chrome-extensions-manually-from-github-1612).**
+For help installing this extension in chrome, please follow the steps indicated [here](https://dev.to/ben/how-to-install-chrome-extensions-manually-from-github-1612).
+
+>*This code has been manually translated from Portuguese to English (US), originally from [GladistonXD](https://github.com/GladistonXD/perlego-download) and mistakes may have been introduced during this process. There are no guarantees of functionality with this code! It's likely there will be little to no updates as I am unsure how long I will be using this service. Some books may have specific bugs because I didn't take the time to test all the possibilities.*
+
+You must first access the book normally before you can start the automation!<br>
+Load it via the standard link: `https://ereader.perlego.com/1/book/(ID*)`
 
 After completing the script, an HTML file should be generated. From this HTML file, it should be possible to print a PDF.
 
@@ -18,11 +23,9 @@ Now you can reload the page if it gets stuck, then just click again to start and
 > # To use offline:
 It is very important to convert the HTML to PDF or it will not be possible to use it offline. (The images have an expiration date.) To convert to PDF, simply open the HTML file, scroll to the bottom as mentioned above so ALL content is loaded, then use CTRL+P to print/save it to PDF. Chrome has this built in, as do most operating, but if not, you can install a free PDF printer.
 
-# *Read the description of each format to avoid browser crashes*
+> # Read the format descriptions to avoid browser crashes:
 <p align="start">
 <img src="https://github.com/UberGuidoZ/perlego-download/assets/57457139/1b8788dd-f3f6-444d-bfcb-832a3c631f24" alt="Description" width="50%" height="50%"/>
 </p>
 
-*After accessing the book normally via: `https://ereader.perlego.com/1/book/(ID*)` you can start the automation.*
-
->*There are no guarantees of functionality with this code! It has been translated manually from Portuguese to English (US), originally from [GladistonXD](https://github.com/GladistonXD/perlego-download) and mistakes may have been introduced during this process. It's likely there will be little to no updates as I am unsure how long I will be using this service. Some books may have specific bugs because I didn't take the time to test all the possibilities.*
+> # Need help? No guarantees but feel free to reach out.
