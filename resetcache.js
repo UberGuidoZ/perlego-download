@@ -1,14 +1,14 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'executeResetarEIniciarCaptura') {
-    resetarEIniciarCaptura();
+  if (message.type === 'executeresetAndStartCapture') {
+    resetAndStartCapture();
 	console.log('ok')
   }
 });
 
 async function resetLastProcessedIndex(db) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['conteudo'], 'readwrite');
-        const store = transaction.objectStore('conteudo');
+        const transaction = db.transaction(['content'], 'readwrite');
+        const store = transaction.objectStore('content');
 
         const deleteRequest = store.delete('lastProcessedIndex');
 
@@ -24,8 +24,8 @@ async function resetLastProcessedIndex(db) {
 
 async function resetAllContent(db) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['conteudo'], 'readwrite');
-        const store = transaction.objectStore('conteudo');
+        const transaction = db.transaction(['content'], 'readwrite');
+        const store = transaction.objectStore('content');
         const request = store.clear();
 
         request.onsuccess = function(event) {
@@ -38,11 +38,11 @@ async function resetAllContent(db) {
     });
 }
 
-async function resetarEIniciarCaptura() {
+async function resetAndStartCapture() {
     const db = await openIndexedDB(); 
     await resetAllContent(db); 
     await resetLastProcessedIndex(db); 
-	alert('Continuity clean successfully!');
+	alert('Cache cleaned successfully!');
 }
 
-resetarEIniciarCaptura();
+resetAndStartCapture();
