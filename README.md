@@ -1,28 +1,28 @@
 # A Chrome extension to automate content downloads
 
-# An active account is required.
+# NOTE: An active Perlego account is required!
 
 -  **To install this extension in chrome please follow the steps indicated [here](https://dev.to/ben/how-to-install-chrome-extensions-manually-from-github-1612).**
 
-After finishing the script, a ".html" file is generated in which it is possible to print in PDF
+After completing the script, an HTML file should be generated. From this HTML file, it should be possible to print a PDF.
 
-In the PDF version, as it does not scroll automatically, I suggest pressing the scroll button and moving the mouse down slightly, or pressing the "Page Down" button to speed up the process.
+Since the PDF version does not scroll automatically, it is recommended to press the scrollwheel button on the mouse, then move the mouse down slightly, so the page will load automatically. If you do not have a scrollwheel (like a trackpad), you can also press the "Page Down" key to speed up the process.
 
-It is very important to go to the end of the page of the saved .html file if you are going to print PDF, as very large files will not load completely until they reach the end of the page. ePUB books can be translated into other languages directly in the .html file
+It is very important to go to the end of the saved HTML file if you are going to print PDF since larger files will not load completely until they reach the end of the page. ePUB books can be translated into other languages directly in the generated HTML file.
 
-If the file is so large that the browser cannot process it, you can edit the .html and cut it into parts to split the process, or use another browser to open the .html, I recommend Firefox which uses less memory.
+If the file is so large that the browser cannot process it, you can manually edit the HTML file and save it into smaller parts to split up the process, or use another browser to open the HTML file. (Firefox may use less memory and work, though Edge is also Chromium-based now.)
 
 > # New function to continue where you left off:
-Now you can reload the page if it's stuck, then just click again to start and continue where you left off, and just below there is a button to reset this continuity if necessary.
+Now you can reload the page if it gets stuck, then just click again to start and continue where you left off. If you need to clear teh cache, there is a button for that too!
 
 > # To use offline:
-It is very important to convert the .html to PDF otherwise it will not be possible to use it offline and also the images have an expiration date, so it is necessary to convert to PDF, if you don't know how to do this, just press "Ctrl + P" with the open .html file and select "Save as PDF"
+It is very important to convert the HTML to PDF or it will not be possible to use it offline. (The images have an expiration date.) To convert to PDF, simply open the HTML file, scroll to the bottom as mentioned above so ALL content is loaded, then use CTRL+P to print/save it to PDF. Chrome has this built in, as do most operating, but if not, you can install a free PDF printer.
 
 # *Read the description of each format to avoid browser crashes*
 <p align="start">
-<img src="https://github.com/GladistonXD/perlego-download/assets/50533550/bfed5fbc-2122-4ab8-b948-e64619ad9b7d" alt="Description" width="50%" height="50%"/>
+<img src="https://github.com/UberGuidoZ/perlego-download/assets/57457139/1b8788dd-f3f6-444d-bfcb-832a3c631f24" alt="Description" width="50%" height="50%"/>
 </p>
 
 *After accessing the book normally via: `https://ereader.perlego.com/1/book/(ID*)` you can start the automation.*
 
->*There are no guarantees of functionality, feel free to take this code and use it as you see fit, there will probably be no updates as I am in the 7 day free period, some books may have specific bugs because I didn't have time to test all the possibilities.*
+>*There are no guarantees of functionality with this code! It has been translated manually from Portuguese to English (US), originally from [GladistonXD](https://github.com/GladistonXD/perlego-download) and mistakes may have been introduced during this process. It's likely there will be little to no updates as I am unsure how long I will be using this service. Some books may have specific bugs because I didn't take the time to test all the possibilities.*
