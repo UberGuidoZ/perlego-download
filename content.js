@@ -1,55 +1,55 @@
-function enviarProgresso(progress){
+function sendProgress(progress){
     chrome.runtime.sendMessage({ type: 'progressUpdate', progress: progress });
 }
 
-function clicarEcapturarConteudoBruto(indice, pagefinal) {
+function clickAndCaptureRawContent(index, pagefinal) {
     const time = 2000
     return new Promise((resolve, reject) => {
-        var elementoIndex = document.querySelector('[data-test-locator="Epub-ChapterRow-Index-'+indice+'"] [tabindex="0"]');
-        if (elementoIndex) {
-            elementoIndex.click();
+        var elementIndex = document.querySelector('[data-test-locator="Epub-ChapterRow-Index-'+index+'"] [tabindex="0"]');
+        if (elementIndex) {
+            elementIndex.click();
             setTimeout(() => {
-                function verificarElemento() {
-                    var elementoCapturado = document.evaluate("//div[@class='chapter-loaded highlighter-context' and @id='p"+indice+"--0']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                    if (elementoCapturado) {
-                        resolve(elementoCapturado.outerHTML+'<br>\n\n');
+                function verifyElement() {
+                    var elementCaptured = document.evaluate("//div[@class='chapter-loaded highlighter-context' and @id='p"+index+"--0']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                    if (elementCaptured) {
+                        resolve(elementCaptured.outerHTML+'<br>\n\n');
                         } else {
-                            setTimeout(verificarElemento, 1000);
+                            setTimeout(verifyElement, 1000);
                         }
                     }
-                    verificarElemento(); 
+                    verifyElement(); 
             }, time);
         
         } else {
             try {
-                const elemento = document.evaluate("//div[@data-test-locator='Pdf-SubChapterRow-Page-"+indice+"']/div", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                const elementosub = document.evaluate("//div[@data-test-locator='Pdf-SubSubChapterRow-Page-"+indice+"']/div", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                if (elemento || elementosub) {
-                    if (elemento) {
-                        elemento.click();
+                const element = document.evaluate("//div[@data-test-locator='Pdf-SubChapterRow-Page-"+index+"']/div", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                const elementsub = document.evaluate("//div[@data-test-locator='Pdf-SubSubChapterRow-Page-"+index+"']/div", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                if (element || elementsub) {
+                    if (element) {
+                        element.click();
                     } else {
-                        elementosub.click();
+                        elementsub.click();
                     }
                     setTimeout(() => {
-                            function verificarElemento() {
-                                var elementoCapturado = document.evaluate("//div[@class='chapter-loaded highlighter-context' and @id='p"+indice+"--0']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                                if (elementoCapturado) {
-                                    resolve(elementoCapturado.outerHTML+'<br>\n\n');
+                            function verifyElement() {
+                                var elementCaptured = document.evaluate("//div[@class='chapter-loaded highlighter-context' and @id='p"+index+"--0']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                                if (elementCaptured) {
+                                    resolve(elementCaptured.outerHTML+'<br>\n\n');
                                 } else {
-                                    setTimeout(verificarElemento, 1000);
+                                    setTimeout(verifyElement, 1000);
                                 }
                             }
-                        verificarElemento(); 
+                        verifyElement(); 
                     }, time);                     
                 } else {
-                    var elementoCapturado = document.evaluate("//div[@class='chapter-loaded highlighter-context' and @id='p"+indice+"--0']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                    if (elementoCapturado) {
-                        resolve(elementoCapturado.outerHTML+'<br>\n\n');
+                    var elementCaptured = document.evaluate("//div[@class='chapter-loaded highlighter-context' and @id='p"+index+"--0']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                    if (elementCaptured) {
+                        resolve(elementCaptured.outerHTML+'<br>\n\n');
                     }
                     try {
-                        const num = indice+1
-                        const elemento = document.evaluate("//div[@data-test-locator='Epub-ChapterRow-Page-"+num+"']/div", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                        if (elemento) {                                
+                        const num = index+1
+                        const element = document.evaluate("//div[@data-test-locator='Epub-ChapterRow-Page-"+num+"']/div", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                        if (element) {                                
                             let stopButton = document.createElement('button');
                             stopButton.textContent = 'PDF file, use manual mode to download';
                             stopButton.style.position = 'fixed';
@@ -61,7 +61,7 @@ function clicarEcapturarConteudoBruto(indice, pagefinal) {
                             stopButton.style.fontWeight = 'bold';
                             document.body.appendChild(stopButton);
                         } else{
-                            reject('Elemento não encontrado ' + indice);
+                            reject('Element not found ' + index);
                         }
                     } catch(error){
                         reject(error);
@@ -69,51 +69,51 @@ function clicarEcapturarConteudoBruto(indice, pagefinal) {
                 }
             
             } catch(error){
-                reject('Elemento não encontrado ' + indice);
+                reject('Element not found ' + index);
             }
         }
     });
 }
 
-async function abrirbotao(){
-    const botaoTOC = document.querySelector('button[data-test-locator="Icon-TOC"]');
-    if (!botaoTOC) {
-        console.log("Botão do Table of Contents não encontrado");
+async function OpenButton(){
+    const buttonTOC = document.querySelector('button[data-test-locator="Icon-TOC"]');
+    if (!buttonTOC) {
+        console.log("Table of Contents button not found");
     } else {
-        let conteudoTOC = document.querySelector('[data-test-locator="ToolbarPanel"]');
+        let contentTOC = document.querySelector('[data-test-locator="ToolbarPanel"]');
 
-        if (!conteudoTOC) {
-            console.log("Conteúdo do Table of Contents não encontrado. Abrindo agora...");
+        if (!contentTOC) {
+            console.log("Table of Contents content not found. Opening now...");
         
-            botaoTOC.click();
+            buttonTOC.click();
         
             setTimeout(() => {
-                conteudoTOC = document.querySelector('[data-test-locator="ToolbarPanel"]');
-                if (conteudoTOC) {
-                    criarArquivoDownloadComConteudo();
-                    console.log("Conteúdo do Table of Contents foi aberto com sucesso.");
+                contentTOC = document.querySelector('[data-test-locator="ToolbarPanel"]');
+                if (contentTOC) {
+                    createFileDownloadContent();
+                    console.log("Table of Contents content was opened successfully.");
                 } else {
-                    console.log("Falha ao abrir o conteúdo do Table of Contents.");
+                    console.log("Failed to open content from Table of Contents.");
                 }
             }, 2000);
         } else {
-            criarArquivoDownloadComConteudo();
+            createFileDownloadContent();
         }
     }
 }
 
 
-async function criarArquivoDownloadComConteudo() {
-    let todoConteudoBruto = '';
-    const elementos = document.querySelectorAll('[data-test-locator^="Epub-ChapterRow-"]');
+async function createFileDownloadContent() {
+    let allRawContent = '';
+    const elements = document.querySelectorAll('[data-test-locator^="Epub-ChapterRow-"]');
     const db = await openIndexedDB(); 
 
-    if (elementos.length > 0) {
+    if (elements.length > 0) {
         let lastProcessedIndex = await getLastProcessedIndex(db) || 0;
         console.log(lastProcessedIndex)
-        let todoConteudoBruto = await getTodoConteudo(db) || ''; 
-        //const ultimoElemento = elementos[elementos.length - 1];
-        //const ultimoIndicecont = ultimoElemento.getAttribute('data-test-locator').match(/\d+$/)[0];
+        let allRawContent = await getAllContent(db) || ''; 
+        //const lastElement = elements[elements.length - 1];
+        //const lastindexcont = lastElement.getAttribute('data-test-locator').match(/\d+$/)[0];
         //const result = document.evaluate("/html/body/div[1]/main/div[1]/div[2]/div[3]/div/text()[3]",document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
         //const result2 = document.evaluate("/html/body/div[1]/main/div[1]/div[2]/div[4]/div/text()[3]",document,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
         //let text = '';
@@ -121,34 +121,34 @@ async function criarArquivoDownloadComConteudo() {
         //let node = result || result2;
         //text = node.textContent.trim();
         var divs = document.querySelectorAll('div[data-test-locator]');
-        var maiorNumero = -1;
-        divs.forEach(function(elemento) {
-            var valor = elemento.getAttribute('data-test-locator');
-            var match = valor.match(/\d+/);
+        var biggerNumber = -1;
+        divs.forEach(function(element) {
+            var value = element.getAttribute('data-test-locator');
+            var match = value.match(/\d+/);
             if (match !== null) {
-                var numero = parseInt(match[0]);
-                if (numero > maiorNumero) {
-                    maiorNumero = numero;
+                var number = parseInt(match[0]);
+                if (number > biggerNumber) {
+                    biggerNumber = number;
                 }
             }
         });
-        const pagefinal = maiorNumero;
-		ultimoIndice = pagefinal
-        console.log("Última página é: " + ultimoIndice);
-        for (let i = lastProcessedIndex; i <= ultimoIndice; i++) {
+        const pagefinal = biggerNumber;
+		lastindex = pagefinal
+        console.log("Last page is: " + lastindex);
+        for (let i = lastProcessedIndex; i <= lastindex; i++) {
             try {
-                const conteudoBruto = await clicarEcapturarConteudoBruto(i, ultimoIndice);
-                todoConteudoBruto += conteudoBruto; 
-                const progressoAtual = Math.floor((i / ultimoIndice) * 100);
-                enviarProgresso(progressoAtual);
+                const rawContent = await clickAndCaptureRawContent(i, lastindex);
+                allRawContent += rawContent; 
+                const currentProgress = Math.floor((i / lastindex) * 100);
+                sendProgress(currentProgress);
                 lastProcessedIndex = i;
                 await putLastProcessedIndex(db, lastProcessedIndex+1);
-                await putTodoConteudo(db, todoConteudoBruto);
+                await putAllContent(db, allRawContent);
             } catch (error) {
                 console.log(error);
             }
         }
-        let img_tags = todoConteudoBruto.split('</picture>');
+        let img_tags = allRawContent.split('</picture>');
 
         let modified_html = '';
 
@@ -168,23 +168,23 @@ async function criarArquivoDownloadComConteudo() {
             }
         }
 
-        let modificado = modified_html.replace(/">https/g, '" src="https').replace(/opacity: 0/g, 'opacity: 1').replace(/<.picture><.picture>/g, '</picture>');
-        var blob = new Blob(['<head><meta charset="UTF-8"></head><div id="content" class="content highlighter-context" col-centered="true" style="max-width: 792.952px;">'+modificado.replace(/Georgia; object-fit: contain; width: 100%; height: 100%;/g,'Georgia; object-fit: contain; width: 100%;')], { type: 'text/html' });
+        let modified = modified_html.replace(/">https/g, '" src="https').replace(/opacity: 0/g, 'opacity: 1').replace(/<.picture><.picture>/g, '</picture>');
+        var blob = new Blob(['<head><meta charset="UTF-8"></head><div id="content" class="content highlighter-context" col-centered="true" style="max-width: 792.952px;">'+modified.replace(/Georgia; object-fit: contain; width: 100%; height: 100%;/g,'Georgia; object-fit: contain; width: 100%;')], { type: 'text/html' });
 
         var link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = 'perlego.html';
 
         link.click();
-        resetarEIniciarCaptura()
+        resetAndStartCapture()
     }
 }
 
-async function getTodoConteudo(db) {
+async function getAllContent(db) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['conteudo'], 'readonly');
-        const store = transaction.objectStore('conteudo');
-        const request = store.get('todoConteudo');
+        const transaction = db.transaction(['content'], 'readonly');
+        const store = transaction.objectStore('content');
+        const request = store.get('allContent');
 
         request.onsuccess = function(event) {
             resolve(event.target.result);
@@ -196,11 +196,11 @@ async function getTodoConteudo(db) {
     });
 }
 
-async function putTodoConteudo(db, content) {
+async function putAllContent(db, content) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['conteudo'], 'readwrite');
-        const store = transaction.objectStore('conteudo');
-        const request = store.put(content, 'todoConteudo');
+        const transaction = db.transaction(['content'], 'readwrite');
+        const store = transaction.objectStore('content');
+        const request = store.put(content, 'allContent');
 
         request.onsuccess = function(event) {
             resolve();
@@ -214,11 +214,11 @@ async function putTodoConteudo(db, content) {
 
 async function openIndexedDB() {
     return new Promise((resolve, reject) => {
-        const dbOpenRequest = window.indexedDB.open('MeuBancoDeDados', 1);
+        const dbOpenRequest = window.indexedDB.open('MyDatabase', 1);
 
         dbOpenRequest.onupgradeneeded = function(event) {
             const db = event.target.result;
-            db.createObjectStore('conteudo', { autoIncrement: true });
+            db.createObjectStore('content', { autoIncrement: true });
         };
 
         dbOpenRequest.onsuccess = function(event) {
@@ -233,8 +233,8 @@ async function openIndexedDB() {
 
 async function getLastProcessedIndex(db) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['conteudo'], 'readonly');
-        const store = transaction.objectStore('conteudo');
+        const transaction = db.transaction(['content'], 'readonly');
+        const store = transaction.objectStore('content');
         const lastIndexRequest = store.get('lastProcessedIndex');
 
         lastIndexRequest.onsuccess = function(event) {
@@ -249,8 +249,8 @@ async function getLastProcessedIndex(db) {
 
 async function putLastProcessedIndex(db, index) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['conteudo'], 'readwrite');
-        const store = transaction.objectStore('conteudo');
+        const transaction = db.transaction(['content'], 'readwrite');
+        const store = transaction.objectStore('content');
         const putRequest = store.put(index, 'lastProcessedIndex');
 
         putRequest.onsuccess = function(event) {
@@ -265,8 +265,8 @@ async function putLastProcessedIndex(db, index) {
 
 async function resetLastProcessedIndex(db) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['conteudo'], 'readwrite');
-        const store = transaction.objectStore('conteudo');
+        const transaction = db.transaction(['content'], 'readwrite');
+        const store = transaction.objectStore('content');
 
         const deleteRequest = store.delete('lastProcessedIndex');
 
@@ -282,8 +282,8 @@ async function resetLastProcessedIndex(db) {
 
 async function resetAllContent(db) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['conteudo'], 'readwrite');
-        const store = transaction.objectStore('conteudo');
+        const transaction = db.transaction(['content'], 'readwrite');
+        const store = transaction.objectStore('content');
         const request = store.clear();
 
         request.onsuccess = function(event) {
@@ -296,10 +296,10 @@ async function resetAllContent(db) {
     });
 }
 
-async function resetarEIniciarCaptura() {
+async function resetAndStartCapture() {
     const db = await openIndexedDB(); 
     await resetAllContent(db);
     await resetLastProcessedIndex(db);
 }
 
-abrirbotao()
+OpenButton()
